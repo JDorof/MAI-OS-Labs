@@ -1,13 +1,21 @@
 #include <iostream>
 #include <sys/wait.h>
+#include <string>
 #include <cstring>
 
+// fd[0] - чтение
+// fd[1] - запись
+
+char * Prepare_str(std::string str) {
+    return const_cast<char*>(str.c_str());
+}
 
 int main() {
-    // fd для передачи данных от родителя к дочернему процессу
     int fd[2];
+
+    // Отлов ошибок при создании 
     if (pipe(fd) == -1) {
-        perror("Error in creating pipe");
+        std::cerr << "Error in creating pipe\n";
         return 1;
     }
 
@@ -17,36 +25,30 @@ int main() {
 
     pid_t pid = fork();
     if (pid == -1) {
-        perror("Ошибка при fork()");
+        std::cerr << "Error in creating fork()\n";
         return 1;
     }
 
-    if (pid == 0) {
-        // Дочерний процесс
-        close(fd[1]);  // Закрываем сторону записи в pipe
-
-        // Подготовка аргументов для execve
-        char pipe_read_fd[10], file_name_arg[256];
-        sprintf(pipe_read_fd, "%d", fd[0]);
-        strcpy(file_name_arg, output_file.c_str());
+    if (pid == 0) { // Дочерний процесс
+        
+        close(fd[1]);  // Закрываем сторону записи в pipe, так как дочерний процесс будет только читать
 
         // Аргументы для execve
-        char *args[] = {"./child", pipe_read_fd, file_name_arg, NULL};
+        char* args[] = {"./child", Prepare_str(std::to_string(fd[0])), Prepare_str(out_file), NULL};
 
         // Выполняем дочернюю программу
         execve("./child", args, NULL);
-        perror("execve");
-        exit(1);
-    } else {
-        // Родительский процесс
-        close(fd[0]);
+        std::cerr << "error in execve\n";
+        return 1;
+    } else { // Родительский процесс
+        close(fd[0]); // Закрытие дескриптора чтения, так как идет запись
 
         // Ввод чисел
-        std::string input_data;
-        std::cout << "Введите числа через пробел: ";
-        std::getline(std::cin, input_data);
+        std::string input;
+        std::cout << "Divider and dividers: ";
+        std::getline(std::cin, input);
 
-        write(fd[1], input_data.c_str(), input_data.size());
+        write(fd[1], input.c_str(), input.size());
         close(fd[1]);
 
         // Ожидаем завершения дочернего процесса
