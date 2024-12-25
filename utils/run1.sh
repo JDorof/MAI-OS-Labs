@@ -1,3 +1,5 @@
-gcc first.c -o first
+#!/bin/bash
+
+gcc first.c -o first -lm
 ./first
 rm first
