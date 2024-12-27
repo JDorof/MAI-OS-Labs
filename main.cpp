@@ -72,12 +72,12 @@ void testPowerOfTwoAllocator() {
         printDuration("PowerOfTwoAllocator creation", start);
 
         start = std::chrono::high_resolution_clock::now();
-        void* block1 = allocator.alloc(128);
+        allocator.debugPrint();
+        void* block1 = allocator.alloc(20);
         // void* block2 = allocator.alloc(64);
         // void* block3 = allocator.alloc(70);
         // void* block2 = allocator.alloc(60);
         printDuration("Allocating blocks in PowerOfTwo Allocator", start);
-
         allocator.debugPrint();
 
         start = std::chrono::high_resolution_clock::now();
