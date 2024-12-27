@@ -65,7 +65,7 @@ struct ThreadData {
 // Thread function for processing a segment of the matrix
 void* process_segment(void* arg) {
     pthread_mutex_lock(&console_mutex);
-    std::cout << "thread ID: " << pthread_self() << std::endl;
+    // std::cout << "thread ID: " << pthread_self() << std::endl;
     pthread_mutex_unlock(&console_mutex);
     
     ThreadData* data = (ThreadData*)arg;
@@ -111,7 +111,7 @@ int main(int argc, char *argv[]) {
     }
 
     for (int iteration = 0; iteration < num_iterations; ++iteration) {
-        std::cout << "\tNumber of iterations = " << iteration << std::endl;
+        // std::cout << "\tNumber of iterations = " << iteration << std::endl;
         pthread_t threads[MAX_THREADS];
         ThreadData thread_data[MAX_THREADS];
         int total_elements = rows * columns;
@@ -143,6 +143,6 @@ int main(int argc, char *argv[]) {
     delete[] result;
     delete[] matrix;
 
-    std::cout << "\texecution time: " << (clock() - start) / (double)CLOCKS_PER_SEC << " seconds" << std::endl;
+    // std::cout << "\texecution time: " << (clock() - start) / (double)CLOCKS_PER_SEC << " seconds" << std::endl;
     return 0;
 }
